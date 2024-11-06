@@ -21,6 +21,7 @@ namespace lab3app.Controllers
             return View();
         }
 
+        //This is the login part
         [HttpPost]
         public async Task<IActionResult> Login(User userLogin)
         {
