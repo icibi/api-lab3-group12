@@ -1,0 +1,46 @@
+﻿@model List<lab3app.Models.Movie>
+
+@{
+    ViewData["Title"] = "Movies Page";
+}
+
+<h1>Movies List</h1>
+
+<!-- Search Form -->
+<form method="get" asp-action="MoviesPage">
+    <div class="mb-3">
+        <label for="search" class="form-label">Search by Title, Director, Genre, or Release Time</label>
+        <input type="text" class="form-control" id="search" name="search" placeholder="Search..." value="@ViewData["SearchQuery"]" />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+<!-- Movies Table -->
+<table class="table mt-4">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Director</th>
+            <th>Genre</th>
+            <th>Release Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in Model)
+        {
+            <tr>
+                <td>@movie.Title</td>
+                <td>@movie.Director</td>
+                <td>@movie.Genre</td>
+                <td>@movie.ReleaseTime</td>
+            </tr>
+        }
+    </tbody>
+</table>
