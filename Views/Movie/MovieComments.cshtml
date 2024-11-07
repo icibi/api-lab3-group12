@@ -1,0 +1,44 @@
+@model lab3app.Models.Movie
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <p>Log in to rate,  comment, and more!</p>
+            </div>
+                <div>
+                    <h1> <strong>Movie Name: </strong>@Model.Title</h1>
+                    <h2> <strong>Release Time: </strong>@Model.ReleaseTime</h2>
+                    <h3> <strong>Genre: </strong>@Model.Genre</h3>
+                    <h3> <strong>Movie Director: </strong>@Model.Director</h3>
+                    <h3>MovieKey: @Model.MovieKey</h3>
+                    <p>UploadedBy: @Model.UploadedBy </p>
+                </div>
+
+                <h3>Average Movie Rating:</h3>
+                <h4>
+                    @if (Model.Ratings != null && Model.Ratings.Any())
+                    {
+                        <p>
+                            @(Model.Ratings.Any() ? Model.Ratings.Average(r => int.TryParse(r.RatingValue, out int val) ? val : 0) :
+                                "No Ratings")
+                        </p>
+                    }
+                    else
+                    {
+                        <p>No Ratings.</p>
+                    }
+                </h4>
+
+                <h3> Comments: </h3>
+                @foreach (var comment in Model.Comments)
+                {
+                    <div>
+                        <p><strong>Commented By: </strong> (@comment.CommentBy)</p>
+                        <p>@comment.CommentText</p>
+                        <p><em>@comment.CommentedTime</em></p>
+                    </div>
+                }
+        </div>
+    </div>
+</div>
