@@ -27,5 +27,8 @@ namespace lab3app
             var credentials = new BasicAWSCredentials(accessKeyID, secretKey);
             return new AmazonDynamoDBClient(credentials, region);
         }
+
+        public static IAmazonS3 GetS3Client()
+            
     }
 }
