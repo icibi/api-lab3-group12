@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using lab3app.Models;
 using System.Threading.Tasks;
-using lab3app.Models;
 
 namespace lab3app.Controllers
 {
@@ -33,12 +33,12 @@ namespace lab3app.Controllers
                 return View(userLogin);
             }
 
-            TempData["UserId"] = user.UserID;
-            TempData["Username"] = user.Username;
+            // Set session variables
+            HttpContext.Session.SetInt32("UserId", user.UserID);
+            HttpContext.Session.SetString("Username", user.Username);
 
             return RedirectToAction("MoviesPage", "Movie");
         }
-
 
         [HttpGet]
         public IActionResult SignUp()
@@ -77,6 +77,15 @@ namespace lab3app.Controllers
                 return RedirectToAction("Login");
             }
             return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult SignOut()
+        {
+            //Clear the session to log the user out
+            HttpContext.Session.Clear();
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

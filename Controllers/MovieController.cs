@@ -1,15 +1,13 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using lab3app.Models;
-using lab3app.Models;
-using lab3app;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace lab3app.Controllers
 {
-    public class MovieController : Controller
+    public class MovieController : BaseController
     {
         private readonly IAmazonDynamoDB _dynamoDbClient;
 
@@ -33,7 +31,7 @@ namespace lab3app.Controllers
                     TableName = "MoviesTable"
                 };
 
-                //scan to retrieve all items
+                //Scan to retrieve all items
                 var response = await _dynamoDbClient.ScanAsync(request);
 
                 //Iterate over the response items and map them to the Movie model
