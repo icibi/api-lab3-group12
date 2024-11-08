@@ -36,8 +36,10 @@ namespace lab3app.Controllers
             // Set session variables
             HttpContext.Session.SetInt32("UserId", user.UserID);
             HttpContext.Session.SetString("Username", user.Username);
+            TempData["UserId"] = user.UserID;
+            TempData["Username"] = user.Username;
 
-            return RedirectToAction("MoviesPage", "Movie");
+            return RedirectToAction("UsersMovies", "Movie");
         }
 
         [HttpGet]

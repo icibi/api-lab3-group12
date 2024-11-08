@@ -25,6 +25,22 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+
+                        @if (TempData["Username"] != null)
+                        {
+                            <li class="nav-item">
+                                <span>Hi @TempData["Username"]</span>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("UsersMovies", "Movie")" class="btn btn-link">@TempData["Username"]'s Movies)</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a href="@Url.Action("Login", "Account")" class="btn btn-link">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
