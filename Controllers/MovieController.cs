@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace lab3app.Controllers
 {
@@ -83,7 +84,7 @@ namespace lab3app.Controllers
         }
 
         //get a movie's details
-        public async Task<IActionResult?> MoviesDetails(string id)
+        public async Task<IActionResult?> MovieDetails(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -261,6 +262,21 @@ namespace lab3app.Controllers
 
             return movie;
 
+        }
+
+        //To enusre access only when logged in
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            // Apply the login requirement only to the "UsersMovies" action
+            if (context.ActionDescriptor.RouteValues["action"] == "UsersMovies")
+            {
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    context.Result = RedirectToAction("Login", "Account");
+                }
+            }
+            base.OnActionExecuting(context);
         }
 
         public async Task<IActionResult> UsersMovies(string search)

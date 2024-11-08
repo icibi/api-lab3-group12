@@ -15,18 +15,16 @@
     <button type="submit" class="btn btn-primary">Search</button>
 </form>
 
+<div>
+    <a href="@Url.Action("UsersMovies", "Movie")" class="btn btn-secondary">My Movies</a>
+</div>
+
 @if (ViewBag.ErrorMessage != null)
 {
     <div class="alert alert-danger">
         @ViewBag.ErrorMessage
     </div>
 }
-
-<!-- Signout button (needs to be moved) -->
-<form asp-action="SignOut" asp-controller="Account" method="post" class="d-inline">
-    <button type="submit" class="btn btn-danger">Sign Out</button>
-</form>
-
 
 <!-- Movies Table -->
 <table class="table mt-4">

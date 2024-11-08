@@ -34,6 +34,12 @@
     <a href="@Url.Action("AddMovie", "Movie")" class="btn btn-secondary">Add Movie</a>
 </div>
 
+<!-- signout button (needs to be moved) -->
+<form asp-action="signout" asp-controller="account" method="post" class="d-inline">
+    <button type="submit" class="btn btn-danger">Sign out</button>
+</form>
+
+
 <!-- Movies Table -->
 <table class="table mt-4">
     <thead>
@@ -54,7 +60,7 @@
                 <tr>
                     @* @if (movie.UploadedBy == @TempData["UserId"])
                     { *@
-                        <td> <a href="@Url.Action("MoviesDetails","Movie", new {id = movie.Id})">@movie.Title </a> </td>
+                        <td> <a href="@Url.Action("MovieDetails","Movie", new {id = movie.Id})">@movie.Title </a> </td>
                         <td>@movie.Director</td>
                         <td>@movie.Genre</td>
                         <td>@movie.ReleaseTime</td>
