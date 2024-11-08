@@ -10,6 +10,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System;
 
 namespace lab3app.Controllers
 {
@@ -42,11 +43,54 @@ namespace lab3app.Controllers
                 };
 
                 //scan to retrieve all items
-                var response = await _dynamoDbClient.ScanAsync(request);
+                ScanResponse response = await _dynamoDbClient.ScanAsync(request);
+
 
                 //Iterate over the response items and map them to the Movie model
                 foreach (var item in response.Items)
                 {
+
+                    List<Comment> comments = new List<Comment>();
+                    List<Rating> ratings = new List<Rating>();
+
+
+                    ////get comments list
+                    if (item.ContainsKey("Comments") && item["Comments"].L != null)
+                    {
+                        comments = item["Comments"].L.Select(commentItem =>
+                        {
+                            Comment? comment = new Comment
+                            {
+                                CommentId = commentItem.M["CommentId"].S,
+                                CommentBy = commentItem.M["CommentBy"].S,
+                                CommentedTime = commentItem.M["CommentedTime"].S,
+                                CommentText = commentItem.M["CommentText"].S,
+                                VideoId = commentItem.M["VideoId"].S
+                            };
+
+                            return comment;
+                        }).ToList();
+                    }
+
+                    ////get ratings list
+                    if (item.ContainsKey("Ratings") && item["Ratings"].L != null)
+                    {
+                        ratings = item["Ratings"].L.Select(ratingItem =>
+                        {
+                            Rating? rating = new Rating
+                            {
+                                RatingId = ratingItem.M["RatingId"].S,
+                                RatedBy = ratingItem.M["RatedBy"].S,
+                                RatedTime = ratingItem.M["RatedTime"].S,
+                                RatingValue = ratingItem.M["RatingValue"].S,
+                                VideoId = ratingItem.M["VideoId"].S
+                            };
+
+                            return rating;
+                        }).ToList();
+                    }
+
+
                     var movie = new Movie
                     {
                         Id = item["Id"].S,
@@ -55,7 +99,10 @@ namespace lab3app.Controllers
                         Genre = item["Genre"].S,
                         ReleaseTime = item["ReleaseTime"].S,
                         UploadedBy = item["UploadedBy"].S,
-                        MovieKey = item["MovieKey"].S
+                        MovieKey = item["MovieKey"].S,
+                        Ratings = ratings,
+                        Comments = comments
+
                     };
 
                     movies.Add(movie);
@@ -271,6 +318,7 @@ namespace lab3app.Controllers
             if (context.ActionDescriptor.RouteValues["action"] == "UsersMovies")
             {
                 var userId = HttpContext.Session.GetInt32("UserId");
+                Console.WriteLine("session userid: " + userId);
                 if (userId == null)
                 {
                     context.Result = RedirectToAction("Login", "Account");
@@ -295,27 +343,30 @@ namespace lab3app.Controllers
                 //scan to retrieve all items
                 var response = await _dynamoDbClient.ScanAsync(request);
 
+                var u = HttpContext.Session.GetInt32("UserId");
+                Console.WriteLine("sessi user id in usersmovies" + u);
+
                 //Iterate over the response items and map them to the Movie model
                 foreach (var item in response.Items)
                 {
-                    //if (item == null || item["UploadedBy"].ToString() != TempData["UserId"] as string)
-                    //{
-                    //    TempData.Keep("UserId");
-                    //    return NotFound("User's movies not found.");
-                    //}
-
-                    var movie = new Movie
+                    
+                    Console.WriteLine("userid from db " + item["UploadedBy"].S);
+                    if (item != null && item["UploadedBy"].S == u.ToString())
                     {
-                        Id = item["Id"].S,
-                        Title = item["Title"].S,
-                        Director = item["Director"].S,
-                        Genre = item["Genre"].S,
-                        ReleaseTime = item["ReleaseTime"].S,
-                        UploadedBy = item["UploadedBy"].S,
-                        MovieKey = item["MovieKey"].S
-                    };
+                        var movie = new Movie
+                        {
+                            Id = item["Id"].S,
+                            Title = item["Title"].S,
+                            Director = item["Director"].S,
+                            Genre = item["Genre"].S,
+                            ReleaseTime = item["ReleaseTime"].S,
+                            UploadedBy = item["UploadedBy"].S,
+                            MovieKey = item["MovieKey"].S
+                        };
 
-                    movies.Add(movie);
+                        movies.Add(movie);
+                    }
+
                 }
 
                 //If a search query is provided, filter the movies

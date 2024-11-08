@@ -34,6 +34,7 @@
             <th>Director</th>
             <th>Genre</th>
             <th>Release Time</th>
+            <th>Average Ratings</th>
         </tr>
     </thead>
     <tbody>
@@ -44,6 +45,20 @@
                 <td>@movie.Director</td>
                 <td>@movie.Genre</td>
                 <td>@movie.ReleaseTime</td>
+                <td>
+
+                    @if (movie.Ratings != null)
+                    {
+                        <p>
+                            @(movie.Ratings.Any() ? movie.Ratings.Average(r => int.TryParse(r.RatingValue, out int val) ? val : 0) : 0)
+                        </p>
+                    }
+                    else
+                    {
+                        <p>No Ratings.</p>
+                    }
+
+                </td>
             </tr>
         }
     </tbody>
