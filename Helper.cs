@@ -1,6 +1,7 @@
 ﻿using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.Runtime;
+using Amazon.S3;
 using Microsoft.Extensions.Configuration;
 
 namespace lab3app

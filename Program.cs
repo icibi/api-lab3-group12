@@ -3,10 +3,12 @@ using lab3app.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.SqlClient;
+using Amazon.S3;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IAmazonDynamoDB>(new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast1));
+builder.Services.AddSingleton<IAmazonS3>(new AmazonS3Client(Amazon.RegionEndpoint.USEast1));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

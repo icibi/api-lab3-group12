@@ -4,6 +4,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace lab3app.Controllers
 {
@@ -24,23 +25,42 @@ namespace lab3app.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile movie, string title, string director, string genre, string releaseTime, string uid)
+        public async Task<IActionResult> Upload()
         {
-            if (movie != null && movie.Length > 0)
+
+            string t = Request.Form["Title"];
+            IFormFile movie = Request.Form.Files["Movie"];
+            string d = Request.Form["Director"];
+            string g = Request.Form["Genre"];
+            string r = Request.Form["ReleaseTime"];
+            Console.WriteLine($"title: {t}");
+
+            if (movie == null)
             {
-                ViewBag.Message = "in if.";
-                Console.WriteLine("test");
+                Console.WriteLine("Null movie!");
+                ViewBag.Message = "Please select a movie to upload.";
+                return RedirectToAction("UsersMovies");
+            }
+
+            if (movie.Length <= 0)
+            {
+                Console.WriteLine("Movie Length must be greater than zero");
+                ViewBag.Message = "Please select a movie to upload.";
+                return RedirectToAction("UsersMovies");
+            }
+
+                Console.WriteLine("uploading...");
                 try
                 {
 
-                    //var uid = TempData["UserId"] as string;
-                    //TempData.Keep("UserId");
+                    var u = HttpContext.Session.GetString("UserId");
+             
 
-                    //if (string.IsNullOrEmpty(userId))
-                    //{
-                    //    ViewBag.Message = "User is not authenticated, please log in.";
-                    //    return RedirectToAction("Login", "User");
-                    //}
+                    if (string.IsNullOrEmpty(u))
+                    {
+                        ViewBag.Message = "User is not authenticated, please log in.";
+                        return RedirectToAction("Login", "User");
+                    }
 
                     var movieKey = movie.FileName;
                     var bucketName = _config["AWS:S3BName"];
@@ -59,27 +79,25 @@ namespace lab3app.Controllers
                             ContentType = movie.ContentType
                         };
 
-                        var r = await _amazonS3Client.PutObjectAsync(putReq);
-                        if (r.HttpStatusCode == System.Net.HttpStatusCode.OK)
+                        var res = await _amazonS3Client.PutObjectAsync(putReq);
+                        if (res.HttpStatusCode == System.Net.HttpStatusCode.OK)
                         {
-                            await SaveMetadataToDynamo(movieKey, title, director, genre, releaseTime, uid);
+                            await SaveMetadataToDynamo(movieKey, t, d, g, r, u);
                         }
                     }
 
-                    ViewBag.Message = "Movie Uploaded Successfully!"
+              
+                    Console.WriteLine("Movie uploaded successfully!");
 ;
                 }
                 catch (Exception e)
                 {
                     ViewBag.Message = $"Error uploading movie: {e.Message}";
-                }
+                    Console.WriteLine($"Error uploading movie: { e.Message}");
             }
-            else
-            {
-                ViewBag.Message = "Please select a movie to upload.";
-            }
+            
 
-            return RedirectToAction("MoviesPage");
+            return RedirectToAction("UsersMovies");
         }
 
 
