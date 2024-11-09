@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -49,55 +50,55 @@ namespace lab3app.Controllers
                 return RedirectToAction("UsersMovies");
             }
 
-                Console.WriteLine("uploading...");
-                try
+            Console.WriteLine("uploading...");
+            try
+            {
+
+                var u = HttpContext.Session.GetString("UserId");
+
+
+                if (string.IsNullOrEmpty(u))
                 {
-
-                    var u = HttpContext.Session.GetString("UserId");
-             
-
-                    if (string.IsNullOrEmpty(u))
-                    {
-                        ViewBag.Message = "User is not authenticated, please log in.";
-                        return RedirectToAction("Login", "User");
-                    }
-
-                    var movieKey = movie.FileName;
-                    var bucketName = _config["AWS:S3BName"];
-                    // var filePath = Path.GetFileName(movie.FileName);
-
-                    var transferUtility = new TransferUtility(_amazonS3Client);
-
-
-                    using (var stream = movie.OpenReadStream())
-                    {
-                        PutObjectRequest putReq = new PutObjectRequest
-                        {
-                            BucketName = bucketName,
-                            Key = movieKey,
-                            InputStream = stream,
-                            ContentType = movie.ContentType
-                        };
-
-                        var res = await _amazonS3Client.PutObjectAsync(putReq);
-                        if (res.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                        {
-                            await SaveMetadataToDynamo(movieKey, t, d, g, r, u);
-                        }
-                    }
-
-              
-                    Console.WriteLine("Movie uploaded successfully!");
-;
+                    ViewBag.Message = "User is not authenticated, please log in.";
+                    return RedirectToAction("Login", "User");
                 }
-                catch (Exception e)
-                {
-                    ViewBag.Message = $"Error uploading movie: {e.Message}";
-                    Console.WriteLine($"Error uploading movie: { e.Message}");
-            }
-            
 
-            return RedirectToAction("UsersMovies");
+                var movieKey = movie.FileName;
+                var bucketName = _config["AWS:S3BName"];
+                // var filePath = Path.GetFileName(movie.FileName);
+
+                var transferUtility = new TransferUtility(_amazonS3Client);
+
+
+                using (var stream = movie.OpenReadStream())
+                {
+                    PutObjectRequest putReq = new PutObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = movieKey,
+                        InputStream = stream,
+                        ContentType = movie.ContentType
+                    };
+
+                    var res = await _amazonS3Client.PutObjectAsync(putReq);
+                    if (res.HttpStatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        await SaveMetadataToDynamo(movieKey, t, d, g, r, u);
+                    }
+                }
+
+
+                Console.WriteLine("Movie uploaded successfully!");
+                ;
+            }
+            catch (Exception e)
+            {
+                ViewBag.Message = $"Error uploading movie: {e.Message}";
+                Console.WriteLine($"Error uploading movie: {e.Message}");
+            }
+
+
+            return RedirectToAction("UsersMovies", "Movie");
         }
 
 
@@ -120,8 +121,6 @@ namespace lab3app.Controllers
             await table.PutItemAsync(doc);
 
         }
-
-
 
     }
 }
