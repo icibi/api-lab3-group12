@@ -54,7 +54,7 @@ namespace lab3app.Controllers
             try
             {
 
-                var u = HttpContext.Session.GetString("UserId");
+                var u = HttpContext.Session.GetInt32("UserId").ToString();
 
 
                 if (string.IsNullOrEmpty(u))
